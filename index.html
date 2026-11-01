@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Call</title>
+<style>
+  :root { --bg: #f4f1ec; --card: #ffffff; --ink: #2f3e46; --muted: #6b7280; --accent: #c8551f; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1d2327; --card: #2a3237; --ink: #eef1f3; --muted: #a3acb3; --accent: #e0703a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: var(--bg); color: var(--ink); padding: 16px;
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .card { background: var(--card); border-radius: 16px; padding: 28px 24px; width: 100%; max-width: 360px;
+          text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+  .num { font-size: 30px; font-weight: 700; letter-spacing: .5px; margin: 8px 0 20px; }
+  a.call { display: block; background: var(--accent); color: #fff; text-decoration: none; font-size: 20px;
+           font-weight: 600; padding: 16px; border-radius: 12px; }
+  p { color: var(--muted); font-size: 14px; margin: 16px 0 0; }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div id="label">Calling</div>
+  <div class="num" id="num"></div>
+  <a class="call" id="btn" href="#">Call</a>
+  <p id="note">If your phone did not ask to call, tap the button.</p>
+</div>
+<script>
+  // The number arrives after "#" (e.g. .../#7209892311), which never leaves the phone.
+  // Only 303 and 720 numbers are accepted; anything else does nothing.
+  (function () {
+    var digits = (location.hash || "").replace(/\D/g, "");
+    if (digits.length === 11 && digits.charAt(0) === "1") digits = digits.slice(1);
+    var ok = digits.length === 10 && /^(303|720)/.test(digits);
+    var card = document.getElementById("card");
+    if (!ok) {
+      card.innerHTML = "<div class='num'>Number not allowed</div><p>This page only dials 303 and 720 numbers.</p>";
+      return;
+    }
+    var pretty = digits.slice(0, 3) + "-" + digits.slice(3, 6) + "-" + digits.slice(6);
+    var tel = "tel:+1" + digits;
+    document.getElementById("num").textContent = pretty;
+    var btn = document.getElementById("btn");
+    btn.href = tel;
+    btn.textContent = "Call " + pretty;
+    history.replaceState(null, "", location.pathname);   // clear the number from the address bar
+    location.href = tel;                                   // the phone asks before dialing
+  })();
+</script>
+</body>
+</html>
